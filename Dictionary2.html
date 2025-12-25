@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runyankole-Rukiga Dictionary </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 45px 15px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-row select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .filter-row button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .filter-row button:active {
+            transform: scale(0.95);
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-row label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 5px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider-row input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-row span {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 70px;
+            font-size: 14px;
+        }
+
+        .stats {
+            text-align: center;
+            padding: 12px;
+            background: #e7f3ff;
+            color: #004085;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .results {
+            padding: 15px;
+            max-height: 50vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .result-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .result-item:active {
+            transform: scale(0.98);
+            border-color: #667eea;
+        }
+
+        .result-item.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .result-word {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 6px;
+        }
+
+        .result-ipa {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-style: italic;
+            margin-bottom: 6px;
+        }
+
+        .result-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .result-preview {
+            color: #495057;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .details {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            min-height: 200px;
+        }
+
+        .details h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .details-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .detail-section {
+            margin-bottom: 18px;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: #212529;
+            line-height: 1.7;
+            font-size: 1em;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px 20px;
+            color: #6c757d;
+        }
+
+        .no-results h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .file-upload {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-upload label:active {
+            transform: scale(0.95);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Improve mobile scrolling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .result-word {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Runyankole-Rukiga Dictionary</h1>
+            <p>Manya orurimi rwawe</p>
+        </div>
+
+        <div class="file-upload" id="uploadSection">
+            <h2 style="margin-bottom: 20px; color: #495057;">Upload Your Dictionary</h2>
+            <input type="file" id="csvFile" accept=".csv,.json" />
+            <label for="csvFile">📁 Choose File</label>
+            <p style="margin-top: 15px; color: #6c757d; font-size: 0.95em;">
+                Select CSV or JSON file<br>
+                <small>(afterexcel.csv or runyakitara.json)</small>
+            </p>
+        </div>
+
+        <div id="loadingSection" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading dictionary...</p>
+            </div>
+        </div>
+
+        <div id="appContent" style="display: none;">
+            <div class="controls">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="🔍 Search words or definitions..." 
+                        autocomplete="off"
+                    />
+                    <span class="search-icon">⌨️</span>
+                </div>
+                
+                <div class="filter-row">
+                    <select id="categorySelect">
+                        <option value="All">All Categories</option>
+                    </select>
+                    <button onclick="clearSearch()">🔄 Clear</button>
+                </div>
+                
+                <div class="slider-row">
+                    <label>Preview:</label>
+                    <input type="range" id="previewSlider" min="40" max="300" value="100" />
+                    <span id="previewValue">100</span>
+                </div>
+            </div>
+
+            <div class="stats" id="stats">
+                Loading entries...
+            </div>
+
+            <div class="results" id="results">
+                <!-- Results will be inserted here -->
+            </div>
+
+            <div class="details">
+                <h3>📖 Entry Details</h3>
+                <div class="details-content" id="detailsContent">
+                    <p style="text-align: center; color: #6c757d; padding: 30px;">
+                        Tap any word to view full details
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let filteredData = [];
+        let searchTimeout = null;
+
+        // File upload handler
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('loadingSection').style.display = 'block';
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const content = event.target.result;
+                
+                try {
+                    if (file.name.endsWith('.json')) {
+                        allData = JSON.parse(content);
+                    } else if (file.name.endsWith('.csv')) {
+                        allData = parseCSV(content);
+                    }
+                    
+                    // Clean data
+                    allData = allData.filter(item => 
+                        item.word && item.word.trim().length > 0
+                    );
+                    
+                    initializeApp();
+                } catch (err) {
+                    alert('Error loading file: ' + err.message);
+                    document.getElementById('uploadSection').style.display = 'block';
+                    document.getElementById('loadingSection').style.display = 'none';
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                // Handle quoted CSV values
+                const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+                const values = lines[i].split(regex).map(v => v.trim().replace(/^"|"$/g, ''));
+                
+                const entry = {};
+                headers.forEach((header, index) => {
+                    entry[header] = values[index] || '';
+                });
+                
+                data.push(entry);
+            }
+
+            return data;
+        }
+
+        function initializeApp() {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+
+            filteredData = [...allData];
+            
+            // Populate categories
+            const categories = [...new Set(allData.map(item => 
+                item.category || 'Uncategorized'
+            ))].sort();
+            
+            const select = document.getElementById('categorySelect');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+
+            // Event listeners - INSTANT search as you type
+            document.getElementById('searchInput').addEventListener('input', function() {
+                // Clear previous timeout
+                if (searchTimeout) clearTimeout(searchTimeout);
+                
+                // Debounce for performance (50ms feels instant)
+                searchTimeout = setTimeout(performSearch, 50);
+            });
+            
+            document.getElementById('categorySelect').addEventListener('change', performSearch);
+            
+            document.getElementById('previewSlider').addEventListener('input', function() {
+                document.getElementById('previewValue').textContent = this.value;
+                renderResults();
+            });
+
+            renderResults();
+        }
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            const category = document.getElementById('categorySelect').value;
+
+            filteredData = allData.filter(item => {
+                const word = (item.word || '').toLowerCase();
+                const definition = (item.clean_text || '').toLowerCase();
+                const itemCategory = item.category || 'Uncategorized';
+
+                const matchesSearch = !searchTerm || 
+                    word.includes(searchTerm) || 
+                    definition.includes(searchTerm);
+                    
+                const matchesCategory = category === 'All' || itemCategory === category;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            renderResults();
+        }
+
+        function renderResults() {
+            const container = document.getElementById('results');
+            const previewLength = parseInt(document.getElementById('previewSlider').value);
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>😔 No results found</h3>
+                        <p>Try different keywords or clear filters</p>
+                    </div>
+                `;
+                document.getElementById('stats').textContent = 'No entries found';
+                return;
+            }
+
+            document.getElementById('stats').textContent = 
+                `📊 Showing ${filteredData.length} of ${allData.length} entries`;
+
+            // Render results (limit to 100 for performance)
+            const displayData = filteredData.slice(0, 100);
+            
+            container.innerHTML = displayData.map((item, index) => {
+                const definition = item.clean_text || '';
+                let preview = definition.length > previewLength 
+                    ? definition.substring(0, previewLength) + '...'
+                    : definition;
+
+                // Highlight search term
+                if (searchTerm) {
+                    const regex = new RegExp(`(${searchTerm})`, 'gi');
+                    preview = preview.replace(regex, '<span class="highlight">$1</span>');
+                }
+
+                return `
+                    <div class="result-item" onclick="showDetails(${index})">
+                        <div class="result-word">${item.word || 'N/A'}</div>
+                        ${item.ipa_toned ? `<div class="result-ipa">${item.ipa_toned}</div>` : ''}
+                        ${item.category ? `<div class="result-category">${item.category}</div>` : ''}
+                        <div class="result-preview">${preview}</div>
+                    </div>
+                `;
+            }).join('');
+
+            if (filteredData.length > 100) {
+                container.innerHTML += `
+                    <div style="text-align: center; padding: 20px; color: #6c757d;">
+                        <p>Showing first 100 results. Refine search to see more.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showDetails(index) {
+            const item = filteredData[index];
+            const container = document.getElementById('detailsContent');
+
+            // Highlight selected
+            document.querySelectorAll('.result-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.result-item');
+            if (items[index]) items[index].classList.add('active');
+
+            container.innerHTML = `
+                <div class="detail-section">
+                    <div class="detail-label">Word</div>
+                    <div class="detail-value" style="font-size: 1.5em; font-weight: 700; color: #667eea;">
+                        ${item.word || 'N/A'}
+                    </div>
+                </div>
+                ${item.ipa_toned ? `
+                    <div class="detail-section">
+                        <div class="detail-label">IPA / Tone</div>
+                        <div class="detail-value" style="font-style: italic;">
+                            ${item.ipa_toned}
+                        </div>
+                    </div>
+                ` : ''}
+                ${item.category ? `
+                    <div class="detail-section">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">
+                            <span style="background: #667eea; color: white; padding: 6px 15px; border-radius: 20px; display: inline-block;">
+                                ${item.category}
+                            </span>
+                        </div>
+                    </div>
+                ` : ''}
+                <div class="detail-section">
+                    <div class="detail-label">Definition</div>
+                    <div class="detail-value">
+                        ${item.clean_text || 'No definition available'}
+                    </div>
+                </div>
+            `;
+
+            // Smooth scroll to details
+            container.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categorySelect').value = 'All';
+            performSearch();
+            document.getElementById('detailsContent').innerHTML = `
+                <p style="text-align: center; color: #6c757d; padding: 30px;">
+                    Tap any word to view full details
+                </p>
+            `;
+        }
+
+        // Prevent zoom on input focus (iOS)
+        document.addEventListener('touchstart', function() {}, {passive: true});
+    </script>
+</body>
+</html>
