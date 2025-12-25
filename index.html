@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runyankole-Rukiga Dictionary </title>
+    <title>Runyankole Dictionary Explorer</title>
     <style>
         * {
             margin: 0;
@@ -281,44 +281,18 @@
             margin-bottom: 10px;
         }
 
-        .file-upload {
-            text-align: center;
-            padding: 40px 20px;
-            background: white;
-        }
-
-        .file-upload input {
-            display: none;
-        }
-
-        .file-upload label {
-            display: inline-block;
-            padding: 15px 30px;
-            background: #667eea;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .file-upload label:active {
-            transform: scale(0.95);
-        }
-
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 40px 20px;
             color: #6c757d;
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
@@ -328,7 +302,28 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Improve mobile scrolling */
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #dc3545;
+        }
+
+        .error h3 {
+            margin-bottom: 15px;
+        }
+
+        .error button {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -362,25 +357,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📚 Runyankole-Rukiga Dictionary</h1>
-            <p>Manya orurimi rwawe</p>
+            <h1>📚 Runyankole Dictionary</h1>
+            <p>Explore Runyankole-Rukiga language</p>
         </div>
 
-        <div class="file-upload" id="uploadSection">
-            <h2 style="margin-bottom: 20px; color: #495057;">Upload Your Dictionary</h2>
-            <input type="file" id="csvFile" accept=".csv,.json" />
-            <label for="csvFile">📁 Choose File</label>
-            <p style="margin-top: 15px; color: #6c757d; font-size: 0.95em;">
-                Select CSV or JSON file<br>
-                <small>(afterexcel.csv or runyakitara.json)</small>
-            </p>
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <p>Loading 8,331 dictionary entries...</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.7;">Please wait a moment</p>
         </div>
 
-        <div id="loadingSection" style="display: none;">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading dictionary...</p>
-            </div>
+        <div class="error" id="errorSection" style="display: none;">
+            <h3>⚠️ Error Loading Dictionary</h3>
+            <p id="errorMessage"></p>
+            <button onclick="location.reload()">🔄 Retry</button>
         </div>
 
         <div id="appContent" style="display: none;">
@@ -413,9 +403,7 @@
                 Loading entries...
             </div>
 
-            <div class="results" id="results">
-                <!-- Results will be inserted here -->
-            </div>
+            <div class="results" id="results"></div>
 
             <div class="details">
                 <h3>📖 Entry Details</h3>
@@ -433,39 +421,68 @@
         let filteredData = [];
         let searchTimeout = null;
 
-        // File upload handler
-        document.getElementById('csvFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Auto-load data on page load
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Try loading from different file names
+                const possibleFiles = [
+                    'runyakitara.json',
+                    'afterexcel.csv',
+                    'data.json',
+                    'dictionary.json',
+                    'dictionary.csv'
+                ];
 
-            document.getElementById('uploadSection').style.display = 'none';
-            document.getElementById('loadingSection').style.display = 'block';
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const content = event.target.result;
+                let loaded = false;
                 
-                try {
-                    if (file.name.endsWith('.json')) {
-                        allData = JSON.parse(content);
-                    } else if (file.name.endsWith('.csv')) {
-                        allData = parseCSV(content);
+                for (const filename of possibleFiles) {
+                    try {
+                        const response = await fetch(filename);
+                        if (response.ok) {
+                            const contentType = response.headers.get('content-type');
+                            
+                            if (contentType && contentType.includes('json')) {
+                                allData = await response.json();
+                            } else {
+                                const text = await response.text();
+                                allData = parseCSV(text);
+                            }
+                            
+                            loaded = true;
+                            console.log(`✅ Loaded data from: ${filename}`);
+                            break;
+                        }
+                    } catch (err) {
+                        // Try next file
+                        continue;
                     }
-                    
-                    // Clean data
-                    allData = allData.filter(item => 
-                        item.word && item.word.trim().length > 0
-                    );
-                    
-                    initializeApp();
-                } catch (err) {
-                    alert('Error loading file: ' + err.message);
-                    document.getElementById('uploadSection').style.display = 'block';
-                    document.getElementById('loadingSection').style.display = 'none';
                 }
-            };
-            reader.readAsText(file);
+
+                if (!loaded) {
+                    throw new Error('Could not find dictionary file. Please ensure runyakitara.json or afterexcel.csv is in the same folder.');
+                }
+                
+                // Clean and validate data
+                allData = allData.filter(item => 
+                    item && item.word && item.word.trim().length > 0
+                );
+
+                if (allData.length === 0) {
+                    throw new Error('Dictionary file is empty or invalid format.');
+                }
+                
+                initializeApp();
+                
+            } catch (err) {
+                showError(err.message);
+            }
         });
+
+        function showError(message) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
 
         function parseCSV(text) {
             const lines = text.trim().split('\n');
@@ -475,7 +492,6 @@
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i].trim()) continue;
                 
-                // Handle quoted CSV values
                 const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
                 const values = lines[i].split(regex).map(v => v.trim().replace(/^"|"$/g, ''));
                 
@@ -484,7 +500,9 @@
                     entry[header] = values[index] || '';
                 });
                 
-                data.push(entry);
+                if (entry.word) {
+                    data.push(entry);
+                }
             }
 
             return data;
@@ -496,7 +514,6 @@
 
             filteredData = [...allData];
             
-            // Populate categories
             const categories = [...new Set(allData.map(item => 
                 item.category || 'Uncategorized'
             ))].sort();
@@ -509,12 +526,8 @@
                 select.appendChild(option);
             });
 
-            // Event listeners - INSTANT search as you type
             document.getElementById('searchInput').addEventListener('input', function() {
-                // Clear previous timeout
                 if (searchTimeout) clearTimeout(searchTimeout);
-                
-                // Debounce for performance (50ms feels instant)
                 searchTimeout = setTimeout(performSearch, 50);
             });
             
@@ -566,9 +579,8 @@
             }
 
             document.getElementById('stats').textContent = 
-                `📊 Showing ${filteredData.length} of ${allData.length} entries`;
+                `📊 Showing ${filteredData.length.toLocaleString()} of ${allData.length.toLocaleString()} entries`;
 
-            // Render results (limit to 100 for performance)
             const displayData = filteredData.slice(0, 100);
             
             container.innerHTML = displayData.map((item, index) => {
@@ -577,7 +589,6 @@
                     ? definition.substring(0, previewLength) + '...'
                     : definition;
 
-                // Highlight search term
                 if (searchTerm) {
                     const regex = new RegExp(`(${searchTerm})`, 'gi');
                     preview = preview.replace(regex, '<span class="highlight">$1</span>');
@@ -606,7 +617,6 @@
             const item = filteredData[index];
             const container = document.getElementById('detailsContent');
 
-            // Highlight selected
             document.querySelectorAll('.result-item').forEach(el => el.classList.remove('active'));
             const items = document.querySelectorAll('.result-item');
             if (items[index]) items[index].classList.add('active');
@@ -644,7 +654,6 @@
                 </div>
             `;
 
-            // Smooth scroll to details
             container.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
@@ -659,7 +668,6 @@
             `;
         }
 
-        // Prevent zoom on input focus (iOS)
         document.addEventListener('touchstart', function() {}, {passive: true});
     </script>
 </body>
