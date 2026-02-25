@@ -1,8 +1,7 @@
 
 # 📚 Runyankole-Rukiga Dictionary Explorer
 
-A beautiful, mobile-friendly web application for exploring the Runyankole-Rukiga language dictionary. Built with pure HTML, CSS, and JavaScript - no dependencies required!
-
+A beautiful, mobile-friendly web application for exploring the Runyankole-Rukiga language dictionary.
 
 ## ✨ Features
 
@@ -12,72 +11,42 @@ A beautiful, mobile-friendly web application for exploring the Runyankole-Rukiga
 - 💡 **Smart Highlighting** - Search terms highlighted in results
 - 📖 **Detailed Entries** - View complete definitions with IPA/tone markers
 - ⚡ **Lightning Fast** - No backend required, runs entirely in browser
-- 🌐 **Offline Ready** - Works without internet after first load
+- 🌐 **Offline Ready** - Works without internet after first load (for those who clone my GitHub repo)
 - 📊 **Live Statistics** - See entry counts in real-time
 
 ## 🚀 Demo
 
-Visit the live demo: [Your GitHub Pages URL will be here]
-
+Visit the live demo: https://kitaralex-edquwgmy.manus.space
 ## 📥 Usage
 
 1. **Open the app** in your web browser
-2. **Upload your dictionary file** (CSV or JSON format)
-3. **Start searching** - Type any word or definition
-4. **Filter by category** - Use the dropdown to narrow results
-5. **Tap any entry** - View full details including IPA notation
+2. **Start searching** - Type any word or definition
+3. **Filter by category** - Use the dropdown to narrow results
+4. **Tap any entry** - View full details including IPA notation
 
 ## 🛠️ Technical Details
 
-- **Pure vanilla JavaScript** - No frameworks or libraries
+- **React**
 - **Responsive design** - Works on phones, tablets, and desktops
-- **CSV & JSON support** - Flexible data input
-- **Client-side processing** - All data handling in browser
-- **Progressive enhancement** - Graceful handling of messy data
 
-## 📂 Data Format
-
-### CSV Format
-```csv
-word,ipa_toned,category,clean_text
-ekigambo,ekigámbo,noun,A word or term in the language
-```
-
-### JSON Format
-```json
-[
-  {
-    "word": "ekigambo",
-    "ipa_toned": "ekigámbo",
-    "category": "noun",
-    "clean_text": "A word or term in the language"
-  }
-]
-```
 
 ## 💻 Installation
 
 ### Option 1: Use Online
-Simply visit the GitHub Pages link above!
+Simply visit the  Page link above!
 
 ### Option 2: Run Locally
 1. Clone this repository:
    ```bash
    git clone https://github.com/ainebyoonagodfrey/runyankole-dictionary.git
    ```
-2. Open `index.html` in your browser
-3. Upload your dictionary file
-
-### Option 3: Host Your Own
-- Upload to any web hosting service
-- Works with GitHub Pages, Netlify, Vercel, etc.
-- Just upload the HTML file - that's it!
 
 ## 🎓 About This Project
 
 This dictionary was created to preserve and promote the Runyankole-Rukiga language. The project represents **months of data collection and cleaning**, driven by passion for language preservation and cultural heritage.
 
 **Fun fact:** This entire project was developed on a mobile phone! 📱
+So if you find bugs you just know data cleaning needs more patience and tools I may not have now.
 
 ## 🌟 Why This Matters
 
@@ -108,10 +77,11 @@ This project is open source and available under the [MIT License](LICENSE).
 - Passionate about language preservation and technology accessibility
 
 > "Never let limited resources limit your dreams. This entire project was built on a phone in a village, proving that dedication matters more than equipment."
+It's always mot about a tool/resource but your mental organization.
 
 ## 🙏 Acknowledgments
 
-- Thanks to everyone who contributed to data collection
+- Thanks to everyone who contributed to data collection especially the UNESCO kavunuzi dictionary pdf that I extracted data from.
 - Inspired by classmates and the tech community
 - Built with determination and passion for language preservation
 
